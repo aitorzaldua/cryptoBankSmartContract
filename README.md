@@ -1,14 +1,9 @@
-# Sample Hardhat Project
+# Crypto Bank => Smart Contract
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a script that deploys that contract.
+Crypto Bank is all about DeFi. The idea is to create a Bank where the customers can take control
 
-Try running some of the following tasks:
+of their data.
 
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat run scripts/deploy.js
-```
-# cryptoBankSmartContract
+#Smart Contract
+
+The current repository contains the smart contracts of the Crypto Bank app.
