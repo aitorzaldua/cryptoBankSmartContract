@@ -35,6 +35,7 @@ contract Customers is AccessControl, Ownable {
     mapping(uint => singleCustomer) CustomersDataBase;
 
 
+    //Potential customer first make a request. The administrator will move it to USER_ROLE if approved.
     function requestToBeCustomer (string memory _name, string memory _surname, string memory _physicalAddress, string memory _passport) public {
 
         _setupRole(REQUESTER_ROLE, msg.sender);
@@ -51,20 +52,28 @@ contract Customers is AccessControl, Ownable {
 
     }
 
-    function getCustomers (uint _customerId) public view returns (string memory, string memory, string memory, string memory, address) {
+    function getCustomers (uint _customerId) public view returns (string memory, string memory, string memory, string memory, address, bytes32) {
 
         singleCustomer storage data = CustomersDataBase[_customerId];
-        return (data.name, data.surname, data.physicalAddress, data.passport, data.clientAccount);
+        return (data.name, data.surname, data.physicalAddress, data.passport, data.clientAccount, data.role);
 
     }
 
      //Change Roles:
-    function addRole(bytes32 role, address account) public onlyRole(ADMIN_ROLE){
-        _grantRole(bytes32(role), account);
+    function addRole(bytes32 _role, uint _customerId) public onlyRole(ADMIN_ROLE){
+        singleCustomer storage userData = CustomersDataBase[_customerId];
+        _grantRole(_role, userData.clientAccount);
+        userData.role = _role;
+
     }
 
     function removeRole(bytes32 role, address account) public onlyRole(ADMIN_ROLE){
         _revokeRole(role, account);
+    }
+
+    //Test if I am a validated user:
+    function onlyUser() public view onlyRole(USER_ROLE){
+        console.log ("Hi, I am user");
     }
 
 }
