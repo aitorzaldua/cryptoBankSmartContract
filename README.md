@@ -22,5 +22,5 @@ The current repository contains the smart contracts of the Crypto Bank app.
 
 # Transactions.sol:
 
-##Inherits the Customers.sol contract
-##Only bank customers can make transfers.
+## Inherits the Customers.sol contract
+## Only bank customers can make transfers.
