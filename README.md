@@ -10,7 +10,7 @@ The current repository contains the smart contracts of the Crypto Bank app.
 
 # Contracts:
 
-## Customers.sol: 
+## Customers.sol:
 
 ## Contract to register the different agents of the application. Administrators, users, etc...
 ## The developer is the superuser. He can assign his rights at any time to another agent.
