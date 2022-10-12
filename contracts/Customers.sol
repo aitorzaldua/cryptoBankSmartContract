@@ -2,19 +2,21 @@
 pragma solidity ^0.8.4;
 
 import "hardhat/console.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Customers is AccessControl, Ownable {
+    using Counters for Counters.Counter;
 
-    uint public customerId;
+    Counters.Counter customerId;
+
 
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
     bytes32 public constant USER_ROLE = keccak256("USER_ROLE");
     bytes32 public constant REQUESTER_ROLE = keccak256("REQUESTER_ROLE");
 
     constructor() {
-        customerId = 0;
 
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setupRole(ADMIN_ROLE, msg.sender);
@@ -35,12 +37,12 @@ contract Customers is AccessControl, Ownable {
     mapping(uint => singleCustomer) CustomersDataBase;
 
 
-    //Potential customer first make a request. The administrator will move it to USER_ROLE if approved.
+    //Every potential customer is, first and foremost, an applicant, for security regulations.
     function requestToBeCustomer (string memory _name, string memory _surname, string memory _physicalAddress, string memory _passport) public {
 
         _setupRole(REQUESTER_ROLE, msg.sender);
 
-        singleCustomer storage newSingleCustomer = CustomersDataBase[customerId];
+        singleCustomer storage newSingleCustomer = CustomersDataBase[customerId.current()];
         newSingleCustomer.name = _name;
         newSingleCustomer.surname = _surname;
         newSingleCustomer.physicalAddress = _physicalAddress;
@@ -48,7 +50,7 @@ contract Customers is AccessControl, Ownable {
         newSingleCustomer.clientAccount = msg.sender;
         newSingleCustomer.role = keccak256("REQUESTER_ROLE");
 
-        customerId++;
+        customerId.increment();
 
     }
 
