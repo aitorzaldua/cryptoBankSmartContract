@@ -56,8 +56,10 @@ describe("ContractTest", function () {
 
         it ("require: Unlocked time should be in future", async function() {
             const currentTime = await time.latest();
-            const {contractTest} = await loadFixture(runEveryTime);
-            
+            const ContractTest = await ethers.getContractFactory("ContractTest");
+
+            await expect(ContractTest.deploy(currentTime, {value: 1})).to.be.revertedWith("Unlocked time should be in future");
+
         })
 
     });
