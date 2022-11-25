@@ -7,7 +7,7 @@ const {
 } = require("@nomicfoundation/hardhat-network-helpers");
 
 const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
-const { ethers } = require("hardhat");
+//const { ethers } = require("hardhat");
 
 describe("ContractTest", function () {
     async function runEveryTime() {
@@ -65,14 +65,56 @@ describe("ContractTest", function () {
     });
 
     describe ("withdraw", function () {
-        it ("Wait till the time period complete", async function () {
-            const {contractTest, unlockedTime} = await loadFixture(runEveryTime);
-
-            const currentTime = await time.latest();
-
-            expect (await contractTest.unlockedTime()).greaterThan(currentTime);
+        describe ("requires" , function () {
+            it ("require: Wait till the time period complete", async function () {
+                const { contractTest } = await loadFixture(runEveryTime);
+    
+                await expect (contractTest.withdraw()).to.be.revertedWith("Wait till the time period complete");
+            })
+    
+            it ("require: you need to be the owner", async function () {
+                const { contractTest, unlockedTime, addr1 } = await loadFixture(runEveryTime);
+    
+                await time.increaseTo(unlockedTime);
+    
+                await expect (contractTest.connect(addr1).withdraw()).to.be.revertedWith("you need to be the owner");
+    
+            })
+    
+            it ("require positive: The unlocked time has arrived and I am the owner", async function () {
+                const { contractTest, unlockedTime, addr1 } = await loadFixture(runEveryTime);
+    
+                await time.increaseTo(unlockedTime);
+    
+                await expect (contractTest.withdraw()).not.to.be.reverted;
+    
+            })
         })
-    })
+        describe ("events", function() {
+            it ("Emit: Send the contract address and the balance", async function() {
+                const { contractTest, unlockedTime, lockedAmount } = await loadFixture(runEveryTime);
+
+                await time.increaseTo(unlockedTime);
+
+                await expect(contractTest.withdraw()).to.emit(contractTest, "Withdrawal").withArgs(lockedAmount, anyValue);
+
+            })
+
+        })
+        describe ("actions", function() {
+            it ("Transfer the balance to the owner", async function() {
+                const { contractTest, unlockedTime, lockedAmount, owner } = await loadFixture(runEveryTime);
+
+                await time.increaseTo(unlockedTime);
+
+                await expect(contractTest.withdraw()).to.changeEtherBalances(
+                    [owner, contractTest],
+                    [lockedAmount, -lockedAmount]
+                );
+            });
+
+        });
+    });
 
   runEveryTime();
 
